@@ -153,19 +153,42 @@ fig
 import pandas as pd
 from itables import init_notebook_mode, show
 
+# Enable itables for notebooks / Quarto
 init_notebook_mode(all_interactive=True)
 
+# Load enriched data
 df_enriched = pd.read_csv("data/df_enriched.csv")
 
-cols = [
-"location_key",
-"life_expectancy",
-"health_expenditure_usd",
-"infant_mortality_rate"
+# Columns we want in the interactive table
+table_cols = [
+    "location_key",
+    "life_expectancy",
+    "health_expenditure_usd",
+    "infant_mortality_rate",
 ]
 
+# Keep only country-level rows and drop rows with missing key values
+df_table = (
+    df_enriched
+    .loc[~df_enriched["location_key"].str.contains("_", na=False), table_cols]
+    .dropna(subset=["life_expectancy", "health_expenditure_usd", "infant_mortality_rate"])
+    .copy()
+)
+
+# Make numbers look nicer
+df_table["life_expectancy"] = df_table["life_expectancy"].round(1)
+df_table["health_expenditure_usd"] = df_table["health_expenditure_usd"].round(0)
+df_table["infant_mortality_rate"] = df_table["infant_mortality_rate"].round(1)
+
+# Show interactive table
 show(
-df_enriched[cols].sort_values("life_expectancy", ascending=False),
+    df_table,
+    columnDefs=[
+        {"targets": 0, "title": "Country"},
+        {"targets": 1, "title": "Life Expectancy (years)"},
+        {"targets": 2, "title": "Health Expenditure (USD per capita)"},
+        {"targets": 3, "title": "Infant Mortality (per 1,000 births)"},
+    ],
 )
 
 ```
