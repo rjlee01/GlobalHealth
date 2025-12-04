@@ -12,10 +12,10 @@ website:
         text: Data Retrieval
       - href: enrichment.ipynb
         text: Cleaning & Enrichment
-      - href: enrichment.ipynb
+      - href: analysis.ipynb
         text: Analysis & Visuals
   page-footer:
-    left: "© 2025 Global Health Analysis — Rayner & Co."
+    left: "© 2025 Global Health Analysis — Minh & Rayner."
     right: "Built with Quarto & Python"
 
 format:

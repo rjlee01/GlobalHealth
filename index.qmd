@@ -89,3 +89,28 @@ fig = px.scatter(
     title="Demo: GDP per Capita vs Cases per 100k"
 )
 fig
+```
+
+## 4. Key Visualizations
+
+Here are some of the main figures from our analysis.
+
+### Model Performance
+
+![](images/modelperformance.png){fig-alt="Model performance of life expectancy models" width="70%"}
+
+### Global Distribution of Mortality
+
+![](images/globaldistribution_of_mortality.png){fig-alt="Global distribution of mortality rates" width="70%"}
+
+### Distribution and Country Count
+
+![](images/distribution_and_countrycount.png){fig-alt="Distribution of life expectancy and country counts" width="70%"}
+
+### Correlation Matrix of Indicators
+
+![](images/corrmatrix_indicators.png){fig-alt="Correlation matrix of health indicators" width="70%"}
+
+### Health Spending vs Life Expectancy
+
+![](images/healthspending_on_lifeexpectancy.png){fig-alt="Health spending vs life expectancy plot" width="70%"}
