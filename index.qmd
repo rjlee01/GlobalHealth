@@ -1,37 +1,80 @@
 ---
-title: "Global Health: COVID & Economic Context"
+title: "Global Health & Economic Vulnerability"
 format:
   html:
-    toc: true
+    toc: false
 ---
 
-# Project Overview
+# Global Health Analysis
 
-This project analyzes global health outcomes using the [Google Cloud COVID-19 Open Data](https://storage.googleapis.com/covid19-open-data/v3/health.csv) 
-and enriches it with macroeconomic indicators from the World Bank API (e.g., GDP per capita).
+This website presents an exploratory data analysis of global health indicators
+and their relationship to economic conditions across countries.
 
-We document:
+We combine **COVID-19 health data** from the [Google COVID-19 Open Data project](
+https://github.com/GoogleCloudPlatform/covid-19-open-data) with **GDP per capita**
+from the [World Bank API](https://api.worldbank.org/), and build a cleaned dataset
+that can be reused for future work. We'll walk you through the entire process if
+you would like to reproduce the same project at your own time!
 
-- **Data retrieval:** automated download of health data and World Bank indicators  
-- **Data enrichment & cleaning:** constructing tidy `health` and `economic_data` tables, then merging into a combined `df_clean`  
-- **Visualization:** interactive charts and tables exploring relationships between health outcomes and economic variables
+---
 
-# Navigation
+## 1. Data Sources & Retrieval
 
-Use the top navigation bar to explore:
+We use two main sources:
 
-- **Data Prep:** how we retrieved and cleaned the raw data  
-- **Analysis:** visualizations and insights
+::: {.columns}
+::: {.column width="50%"}
+### Health Data
 
-# Example interactive widget (placeholder)
+- Provider: **Google / Harvard Global Health Institute (COVID-19 Open Data)**
+- Format: CSV (`health.csv`)
+- Access: Public Google Cloud Storage bucket  
+- URL:  
+  `https://storage.googleapis.com/covid19-open-data/v3/health.csv`
+:::
 
-Below is an example of where an interactive widget (e.g., Plotly chart or itables) can go:
+::: {.column width="50%"}
+### Economic Data
+
+- Provider: **World Bank**
+- Indicators:
+  - `NY.GDP.PCAP.CD` — GDP per capita (current US$)
+- Format: JSON from World Bank REST API
+- Access: Public API endpoint
+:::
+:::
+
+See the **Data & Methods** page for the exact Python code used to:
+
+- Download `health.csv` directly from the URL
+- Query the World Bank API for GDP per capita
+- Merge both into a single tidy DataFrame (`df_clean`)
+
+---
+
+## 2. Key Questions
+
+We focus on questions such as:
+
+- How do **health outcomes** vary across income levels?
+- Is there a visible relationship between **GDP per capita** and
+  **COVID-19 burden** (e.g., cases or deaths per 100k)?
+- Which regions appear as **outliers** in terms of health vs. income?
+
+These are explored in more depth on the **Analysis & Visuals** page.
+
+---
+
+## 3. Interactive Exploration
+
+Below is an example interactive widget that lets you explore a subset of
+our final dataset. In the full project, this will be replaced by a plot
+using the real `df_clean` DataFrame.
 
 ```{python}
 import plotly.express as px
 import pandas as pd
 
-# Tiny demo dataset – replace with a real subset of your df_clean
 demo = pd.DataFrame({
     "country": ["A", "B", "C", "D"],
     "gdp_per_capita_usd": [1000, 5000, 15000, 25000],

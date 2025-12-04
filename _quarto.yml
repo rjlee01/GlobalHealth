@@ -14,9 +14,15 @@ website:
         text: Cleaning & Enrichment
       - href: enrichment.ipynb
         text: Analysis & Visuals
+  page-footer:
+    left: "© 2025 Global Health Analysis — Rayner & Co."
+    right: "Built with Quarto & Python"
 
 format:
   html:
     theme: litera
     toc: true
+    toc-location: left
     smooth-scroll: true
+    code-fold: true
+    code-tools: true
