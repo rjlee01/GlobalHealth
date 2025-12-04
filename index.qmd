@@ -1,0 +1,48 @@
+---
+title: "Global Health: COVID & Economic Context"
+format:
+  html:
+    toc: true
+---
+
+# Project Overview
+
+This project analyzes global health outcomes using the [Google Cloud COVID-19 Open Data](https://storage.googleapis.com/covid19-open-data/v3/health.csv) 
+and enriches it with macroeconomic indicators from the World Bank API (e.g., GDP per capita).
+
+We document:
+
+- **Data retrieval:** automated download of health data and World Bank indicators  
+- **Data enrichment & cleaning:** constructing tidy `health` and `economic_data` tables, then merging into a combined `df_clean`  
+- **Visualization:** interactive charts and tables exploring relationships between health outcomes and economic variables
+
+# Navigation
+
+Use the top navigation bar to explore:
+
+- **Data Prep:** how we retrieved and cleaned the raw data  
+- **Analysis:** visualizations and insights
+
+# Example interactive widget (placeholder)
+
+Below is an example of where an interactive widget (e.g., Plotly chart or itables) can go:
+
+```{python}
+import plotly.express as px
+import pandas as pd
+
+# Tiny demo dataset – replace with a real subset of your df_clean
+demo = pd.DataFrame({
+    "country": ["A", "B", "C", "D"],
+    "gdp_per_capita_usd": [1000, 5000, 15000, 25000],
+    "cases_per_100k": [200, 800, 1200, 400]
+})
+
+fig = px.scatter(
+    demo,
+    x="gdp_per_capita_usd",
+    y="cases_per_100k",
+    hover_name="country",
+    title="Demo: GDP per Capita vs Cases per 100k"
+)
+fig

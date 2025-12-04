@@ -1,0 +1,22 @@
+project:
+  type: website
+  output-dir: docs
+
+website:
+  title: "Global Health Analysis"
+  navbar:
+    left:
+      - href: index.qmd
+        text: Home
+      - href: retrieval.ipynb
+        text: Data Retrieval
+      - href: enrichment.ipynb
+        text: Cleaning & Enrichment
+      - href: enrichment.ipynb
+        text: Analysis & Visuals
+
+format:
+  html:
+    theme: litera
+    toc: true
+    smooth-scroll: true
