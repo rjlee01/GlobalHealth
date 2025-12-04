@@ -723,240 +723,290 @@ Top 10 countries by GDP per capita:
 Local files created in: /Users/raynerjlee/Downloads/MA705/Project Health/data</code></pre>
 </div>
 </div>
-<div id="bd3089ba" class="cell">
+<div id="bd3089ba" class="cell" data-execution_count="17">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ==============================</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="co"># 4. ANALYSIS &amp; PLOTS (no sklearn)</span></span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="co"># ==============================</span></span>
 <span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Make sure required columns exist or handle missing:</span></span>
-<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>required_cols <span class="op">=</span> [</span>
-<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>    <span class="st">"life_expectancy"</span>,</span>
-<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>    <span class="st">"infant_mortality_rate"</span>,</span>
-<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>    <span class="st">"adult_male_mortality_rate"</span>,</span>
-<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>    <span class="st">"adult_female_mortality_rate"</span>,</span>
-<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>    <span class="st">"pollution_mortality_rate"</span>,</span>
-<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>    <span class="st">"health_expenditure_usd"</span>,</span>
-<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>    <span class="st">"physicians_per_1000"</span>,</span>
-<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>    <span class="st">"nurses_per_1000"</span>,</span>
-<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>    <span class="st">"smoking_prevalence"</span>,</span>
-<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>    <span class="st">"diabetes_prevalence"</span>,</span>
-<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>    <span class="st">"location_key"</span></span>
-<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a>]</span>
-<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a>missing_cols <span class="op">=</span> [c <span class="cf">for</span> c <span class="kw">in</span> required_cols <span class="cf">if</span> c <span class="kw">not</span> <span class="kw">in</span> df_enriched.columns]</span>
-<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> missing_cols:</span>
-<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"⚠ WARNING: The following columns are missing from df_enriched:"</span>)</span>
-<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"   "</span>, missing_cols)</span>
-<span id="cb9-29"><a href="#cb9-29" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"   The analysis below is skipped until these columns are created/renamed.</span><span class="ch">\n</span><span class="st">"</span>)</span>
-<span id="cb9-30"><a href="#cb9-30" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
-<span id="cb9-31"><a href="#cb9-31" aria-hidden="true" tabindex="-1"></a>    <span class="co"># --- Meaningful Summary Statistics ---</span></span>
-<span id="cb9-32"><a href="#cb9-32" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-33"><a href="#cb9-33" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Life Expectancy Statistics (in years):"</span>)</span>
-<span id="cb9-34"><a href="#cb9-34" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  Mean:      </span><span class="sc">{</span>df_enriched[<span class="st">'life_expectancy'</span>]<span class="sc">.</span>mean()<span class="sc">:.2f}</span><span class="ss">"</span>)</span>
-<span id="cb9-35"><a href="#cb9-35" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  Median:    </span><span class="sc">{</span>df_enriched[<span class="st">'life_expectancy'</span>]<span class="sc">.</span>median()<span class="sc">:.2f}</span><span class="ss">"</span>)</span>
-<span id="cb9-36"><a href="#cb9-36" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  Std Dev:   </span><span class="sc">{</span>df_enriched[<span class="st">'life_expectancy'</span>]<span class="sc">.</span>std()<span class="sc">:.2f}</span><span class="ss">"</span>)</span>
-<span id="cb9-37"><a href="#cb9-37" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  Min:       </span><span class="sc">{</span>df_enriched[<span class="st">'life_expectancy'</span>]<span class="sc">.</span><span class="bu">min</span>()<span class="sc">:.2f}</span><span class="ss">"</span>)</span>
-<span id="cb9-38"><a href="#cb9-38" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  25th %ile: </span><span class="sc">{</span>df_enriched[<span class="st">'life_expectancy'</span>]<span class="sc">.</span>quantile(<span class="fl">0.25</span>)<span class="sc">:.2f}</span><span class="ss">"</span>)</span>
-<span id="cb9-39"><a href="#cb9-39" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  75th %ile: </span><span class="sc">{</span>df_enriched[<span class="st">'life_expectancy'</span>]<span class="sc">.</span>quantile(<span class="fl">0.75</span>)<span class="sc">:.2f}</span><span class="ss">"</span>)</span>
-<span id="cb9-40"><a href="#cb9-40" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  Max:       </span><span class="sc">{</span>df_enriched[<span class="st">'life_expectancy'</span>]<span class="sc">.</span><span class="bu">max</span>()<span class="sc">:.2f}</span><span class="ch">\n</span><span class="ss">"</span>)</span>
-<span id="cb9-41"><a href="#cb9-41" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-42"><a href="#cb9-42" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Infant Mortality Rate (per 1000 births):"</span>)</span>
-<span id="cb9-43"><a href="#cb9-43" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  Mean:   </span><span class="sc">{</span>df_enriched[<span class="st">'infant_mortality_rate'</span>]<span class="sc">.</span>mean()<span class="sc">:.2f}</span><span class="ss">"</span>)</span>
-<span id="cb9-44"><a href="#cb9-44" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  Median: </span><span class="sc">{</span>df_enriched[<span class="st">'infant_mortality_rate'</span>]<span class="sc">.</span>median()<span class="sc">:.2f}</span><span class="ss">"</span>)</span>
-<span id="cb9-45"><a href="#cb9-45" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  Min:    </span><span class="sc">{</span>df_enriched[<span class="st">'infant_mortality_rate'</span>]<span class="sc">.</span><span class="bu">min</span>()<span class="sc">:.2f}</span><span class="ss">"</span>)</span>
-<span id="cb9-46"><a href="#cb9-46" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  Max:    </span><span class="sc">{</span>df_enriched[<span class="st">'infant_mortality_rate'</span>]<span class="sc">.</span><span class="bu">max</span>()<span class="sc">:.2f}</span><span class="ch">\n</span><span class="ss">"</span>)</span>
-<span id="cb9-47"><a href="#cb9-47" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-48"><a href="#cb9-48" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Health Expenditure (USD per capita):"</span>)</span>
-<span id="cb9-49"><a href="#cb9-49" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  Mean:      $</span><span class="sc">{</span>df_enriched[<span class="st">'health_expenditure_usd'</span>]<span class="sc">.</span>mean()<span class="sc">:.0f}</span><span class="ss">"</span>)</span>
-<span id="cb9-50"><a href="#cb9-50" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  Median:    $</span><span class="sc">{</span>df_enriched[<span class="st">'health_expenditure_usd'</span>]<span class="sc">.</span>median()<span class="sc">:.0f}</span><span class="ss">"</span>)</span>
-<span id="cb9-51"><a href="#cb9-51" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  Min:       $</span><span class="sc">{</span>df_enriched[<span class="st">'health_expenditure_usd'</span>]<span class="sc">.</span><span class="bu">min</span>()<span class="sc">:.0f}</span><span class="ss">"</span>)</span>
-<span id="cb9-52"><a href="#cb9-52" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  Max:       $</span><span class="sc">{</span>df_enriched[<span class="st">'health_expenditure_usd'</span>]<span class="sc">.</span><span class="bu">max</span>()<span class="sc">:.0f}</span><span class="ss">"</span>)</span>
-<span id="cb9-53"><a href="#cb9-53" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  90th:      $</span><span class="sc">{</span>df_enriched[<span class="st">'health_expenditure_usd'</span>]<span class="sc">.</span>quantile(<span class="fl">0.9</span>)<span class="sc">:.0f}</span><span class="ch">\n</span><span class="ss">"</span>)</span>
-<span id="cb9-54"><a href="#cb9-54" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-55"><a href="#cb9-55" aria-hidden="true" tabindex="-1"></a>    <span class="co"># --- Life Expectancy Distribution ---</span></span>
-<span id="cb9-56"><a href="#cb9-56" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-57"><a href="#cb9-57" aria-hidden="true" tabindex="-1"></a>    fig, (ax1, ax2) <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">16</span>, <span class="dv">6</span>))</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="co"># First ensure df_enriched is available</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="st">"df_enriched"</span> <span class="kw">not</span> <span class="kw">in</span> <span class="bu">globals</span>():</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Adjust path if your CSV is elsewhere</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>    df_enriched <span class="op">=</span> pd.read_csv(<span class="st">"data/df_enriched.csv"</span>)</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Loaded df_enriched from data/df_enriched.csv"</span>)</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Using existing df_enriched from memory"</span>)</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Make sure required columns exist or handle missing:</span></span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>required_cols <span class="op">=</span> [</span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>    <span class="st">"life_expectancy"</span>,</span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>    <span class="st">"infant_mortality_rate"</span>,</span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>    <span class="st">"adult_male_mortality_rate"</span>,</span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>    <span class="st">"adult_female_mortality_rate"</span>,</span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>    <span class="st">"pollution_mortality_rate"</span>,</span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>    <span class="st">"health_expenditure_usd"</span>,</span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>    <span class="st">"physicians_per_1000"</span>,</span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a>    <span class="st">"nurses_per_1000"</span>,</span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a>    <span class="st">"smoking_prevalence"</span>,</span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a>    <span class="st">"diabetes_prevalence"</span>,</span>
+<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a>    <span class="st">"location_key"</span></span>
+<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a>]</span>
+<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-29"><a href="#cb9-29" aria-hidden="true" tabindex="-1"></a>missing_cols <span class="op">=</span> [c <span class="cf">for</span> c <span class="kw">in</span> required_cols <span class="cf">if</span> c <span class="kw">not</span> <span class="kw">in</span> df_enriched.columns]</span>
+<span id="cb9-30"><a href="#cb9-30" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> missing_cols:</span>
+<span id="cb9-31"><a href="#cb9-31" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"⚠ WARNING: The following columns are missing from df_enriched:"</span>)</span>
+<span id="cb9-32"><a href="#cb9-32" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"   "</span>, missing_cols)</span>
+<span id="cb9-33"><a href="#cb9-33" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"   The analysis below is skipped until these columns are created/renamed.</span><span class="ch">\n</span><span class="st">"</span>)</span>
+<span id="cb9-34"><a href="#cb9-34" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb9-35"><a href="#cb9-35" aria-hidden="true" tabindex="-1"></a>    <span class="co"># --- Meaningful Summary Statistics ---</span></span>
+<span id="cb9-36"><a href="#cb9-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-37"><a href="#cb9-37" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Life Expectancy Statistics (in years):"</span>)</span>
+<span id="cb9-38"><a href="#cb9-38" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  Mean:      </span><span class="sc">{</span>df_enriched[<span class="st">'life_expectancy'</span>]<span class="sc">.</span>mean()<span class="sc">:.2f}</span><span class="ss">"</span>)</span>
+<span id="cb9-39"><a href="#cb9-39" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  Median:    </span><span class="sc">{</span>df_enriched[<span class="st">'life_expectancy'</span>]<span class="sc">.</span>median()<span class="sc">:.2f}</span><span class="ss">"</span>)</span>
+<span id="cb9-40"><a href="#cb9-40" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  Std Dev:   </span><span class="sc">{</span>df_enriched[<span class="st">'life_expectancy'</span>]<span class="sc">.</span>std()<span class="sc">:.2f}</span><span class="ss">"</span>)</span>
+<span id="cb9-41"><a href="#cb9-41" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  Min:       </span><span class="sc">{</span>df_enriched[<span class="st">'life_expectancy'</span>]<span class="sc">.</span><span class="bu">min</span>()<span class="sc">:.2f}</span><span class="ss">"</span>)</span>
+<span id="cb9-42"><a href="#cb9-42" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  25th %ile: </span><span class="sc">{</span>df_enriched[<span class="st">'life_expectancy'</span>]<span class="sc">.</span>quantile(<span class="fl">0.25</span>)<span class="sc">:.2f}</span><span class="ss">"</span>)</span>
+<span id="cb9-43"><a href="#cb9-43" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  75th %ile: </span><span class="sc">{</span>df_enriched[<span class="st">'life_expectancy'</span>]<span class="sc">.</span>quantile(<span class="fl">0.75</span>)<span class="sc">:.2f}</span><span class="ss">"</span>)</span>
+<span id="cb9-44"><a href="#cb9-44" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  Max:       </span><span class="sc">{</span>df_enriched[<span class="st">'life_expectancy'</span>]<span class="sc">.</span><span class="bu">max</span>()<span class="sc">:.2f}</span><span class="ch">\n</span><span class="ss">"</span>)</span>
+<span id="cb9-45"><a href="#cb9-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-46"><a href="#cb9-46" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Infant Mortality Rate (per 1000 births):"</span>)</span>
+<span id="cb9-47"><a href="#cb9-47" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  Mean:   </span><span class="sc">{</span>df_enriched[<span class="st">'infant_mortality_rate'</span>]<span class="sc">.</span>mean()<span class="sc">:.2f}</span><span class="ss">"</span>)</span>
+<span id="cb9-48"><a href="#cb9-48" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  Median: </span><span class="sc">{</span>df_enriched[<span class="st">'infant_mortality_rate'</span>]<span class="sc">.</span>median()<span class="sc">:.2f}</span><span class="ss">"</span>)</span>
+<span id="cb9-49"><a href="#cb9-49" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  Min:    </span><span class="sc">{</span>df_enriched[<span class="st">'infant_mortality_rate'</span>]<span class="sc">.</span><span class="bu">min</span>()<span class="sc">:.2f}</span><span class="ss">"</span>)</span>
+<span id="cb9-50"><a href="#cb9-50" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  Max:    </span><span class="sc">{</span>df_enriched[<span class="st">'infant_mortality_rate'</span>]<span class="sc">.</span><span class="bu">max</span>()<span class="sc">:.2f}</span><span class="ch">\n</span><span class="ss">"</span>)</span>
+<span id="cb9-51"><a href="#cb9-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-52"><a href="#cb9-52" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Health Expenditure (USD per capita):"</span>)</span>
+<span id="cb9-53"><a href="#cb9-53" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  Mean:      $</span><span class="sc">{</span>df_enriched[<span class="st">'health_expenditure_usd'</span>]<span class="sc">.</span>mean()<span class="sc">:.0f}</span><span class="ss">"</span>)</span>
+<span id="cb9-54"><a href="#cb9-54" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  Median:    $</span><span class="sc">{</span>df_enriched[<span class="st">'health_expenditure_usd'</span>]<span class="sc">.</span>median()<span class="sc">:.0f}</span><span class="ss">"</span>)</span>
+<span id="cb9-55"><a href="#cb9-55" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  Min:       $</span><span class="sc">{</span>df_enriched[<span class="st">'health_expenditure_usd'</span>]<span class="sc">.</span><span class="bu">min</span>()<span class="sc">:.0f}</span><span class="ss">"</span>)</span>
+<span id="cb9-56"><a href="#cb9-56" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  Max:       $</span><span class="sc">{</span>df_enriched[<span class="st">'health_expenditure_usd'</span>]<span class="sc">.</span><span class="bu">max</span>()<span class="sc">:.0f}</span><span class="ss">"</span>)</span>
+<span id="cb9-57"><a href="#cb9-57" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  90th:      $</span><span class="sc">{</span>df_enriched[<span class="st">'health_expenditure_usd'</span>]<span class="sc">.</span>quantile(<span class="fl">0.9</span>)<span class="sc">:.0f}</span><span class="ch">\n</span><span class="ss">"</span>)</span>
 <span id="cb9-58"><a href="#cb9-58" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-59"><a href="#cb9-59" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Top 15</span></span>
-<span id="cb9-60"><a href="#cb9-60" aria-hidden="true" tabindex="-1"></a>    top_15 <span class="op">=</span> (</span>
-<span id="cb9-61"><a href="#cb9-61" aria-hidden="true" tabindex="-1"></a>        df_enriched</span>
-<span id="cb9-62"><a href="#cb9-62" aria-hidden="true" tabindex="-1"></a>        .nlargest(<span class="dv">15</span>, <span class="st">"life_expectancy"</span>)[[<span class="st">"location_key"</span>, <span class="st">"life_expectancy"</span>]]</span>
-<span id="cb9-63"><a href="#cb9-63" aria-hidden="true" tabindex="-1"></a>        .sort_values(<span class="st">"life_expectancy"</span>)</span>
-<span id="cb9-64"><a href="#cb9-64" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb9-65"><a href="#cb9-65" aria-hidden="true" tabindex="-1"></a>    ax1.barh(top_15[<span class="st">"location_key"</span>], top_15[<span class="st">"life_expectancy"</span>], color<span class="op">=</span><span class="st">"#2ecc71"</span>)</span>
-<span id="cb9-66"><a href="#cb9-66" aria-hidden="true" tabindex="-1"></a>    ax1.set_xlabel(<span class="st">"Life Expectancy (years)"</span>, fontsize<span class="op">=</span><span class="dv">12</span>, fontweight<span class="op">=</span><span class="st">"bold"</span>)</span>
-<span id="cb9-67"><a href="#cb9-67" aria-hidden="true" tabindex="-1"></a>    ax1.set_title(<span class="st">"Top 15 - Highest Life Expectancy"</span>, fontsize<span class="op">=</span><span class="dv">13</span>, fontweight<span class="op">=</span><span class="st">"bold"</span>)</span>
-<span id="cb9-68"><a href="#cb9-68" aria-hidden="true" tabindex="-1"></a>    ax1.set_xlim(<span class="dv">75</span>, <span class="dv">90</span>)</span>
-<span id="cb9-69"><a href="#cb9-69" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i, v <span class="kw">in</span> <span class="bu">enumerate</span>(top_15[<span class="st">"life_expectancy"</span>]):</span>
-<span id="cb9-70"><a href="#cb9-70" aria-hidden="true" tabindex="-1"></a>        ax1.text(v <span class="op">+</span> <span class="fl">0.2</span>, i, <span class="ss">f"</span><span class="sc">{</span>v<span class="sc">:.1f}</span><span class="ss">"</span>, va<span class="op">=</span><span class="st">"center"</span>, fontweight<span class="op">=</span><span class="st">"bold"</span>)</span>
-<span id="cb9-71"><a href="#cb9-71" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-72"><a href="#cb9-72" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Bottom 15</span></span>
-<span id="cb9-73"><a href="#cb9-73" aria-hidden="true" tabindex="-1"></a>    bottom_15 <span class="op">=</span> (</span>
-<span id="cb9-74"><a href="#cb9-74" aria-hidden="true" tabindex="-1"></a>        df_enriched</span>
-<span id="cb9-75"><a href="#cb9-75" aria-hidden="true" tabindex="-1"></a>        .nsmallest(<span class="dv">15</span>, <span class="st">"life_expectancy"</span>)[[<span class="st">"location_key"</span>, <span class="st">"life_expectancy"</span>]]</span>
-<span id="cb9-76"><a href="#cb9-76" aria-hidden="true" tabindex="-1"></a>        .sort_values(<span class="st">"life_expectancy"</span>)</span>
-<span id="cb9-77"><a href="#cb9-77" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb9-78"><a href="#cb9-78" aria-hidden="true" tabindex="-1"></a>    ax2.barh(bottom_15[<span class="st">"location_key"</span>], bottom_15[<span class="st">"life_expectancy"</span>], color<span class="op">=</span><span class="st">"#e74c3c"</span>)</span>
-<span id="cb9-79"><a href="#cb9-79" aria-hidden="true" tabindex="-1"></a>    ax2.set_xlabel(<span class="st">"Life Expectancy (years)"</span>, fontsize<span class="op">=</span><span class="dv">12</span>, fontweight<span class="op">=</span><span class="st">"bold"</span>)</span>
-<span id="cb9-80"><a href="#cb9-80" aria-hidden="true" tabindex="-1"></a>    ax2.set_title(<span class="st">"Bottom 15 - Lowest Life Expectancy"</span>, fontsize<span class="op">=</span><span class="dv">13</span>, fontweight<span class="op">=</span><span class="st">"bold"</span>)</span>
-<span id="cb9-81"><a href="#cb9-81" aria-hidden="true" tabindex="-1"></a>    ax2.set_xlim(<span class="dv">50</span>, <span class="dv">65</span>)</span>
-<span id="cb9-82"><a href="#cb9-82" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i, v <span class="kw">in</span> <span class="bu">enumerate</span>(bottom_15[<span class="st">"life_expectancy"</span>]):</span>
-<span id="cb9-83"><a href="#cb9-83" aria-hidden="true" tabindex="-1"></a>        ax2.text(v <span class="op">+</span> <span class="fl">0.2</span>, i, <span class="ss">f"</span><span class="sc">{</span>v<span class="sc">:.1f}</span><span class="ss">"</span>, va<span class="op">=</span><span class="st">"center"</span>, fontweight<span class="op">=</span><span class="st">"bold"</span>)</span>
-<span id="cb9-84"><a href="#cb9-84" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-85"><a href="#cb9-85" aria-hidden="true" tabindex="-1"></a>    plt.tight_layout()</span>
-<span id="cb9-86"><a href="#cb9-86" aria-hidden="true" tabindex="-1"></a>    plt.show()</span>
-<span id="cb9-87"><a href="#cb9-87" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-88"><a href="#cb9-88" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(</span>
-<span id="cb9-89"><a href="#cb9-89" aria-hidden="true" tabindex="-1"></a>        <span class="ss">f"They have a "</span></span>
-<span id="cb9-90"><a href="#cb9-90" aria-hidden="true" tabindex="-1"></a>        <span class="ss">f"</span><span class="sc">{</span>top_15[<span class="st">'life_expectancy'</span>]<span class="sc">.</span>iloc[<span class="op">-</span><span class="dv">1</span>] <span class="op">-</span> bottom_15[<span class="st">'life_expectancy'</span>]<span class="sc">.</span>iloc[<span class="dv">0</span>]<span class="sc">:.1f}</span><span class="ss"> "</span></span>
-<span id="cb9-91"><a href="#cb9-91" aria-hidden="true" tabindex="-1"></a>        <span class="ss">f"year global gap</span><span class="ch">\n</span><span class="ss">"</span></span>
-<span id="cb9-92"><a href="#cb9-92" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb9-93"><a href="#cb9-93" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-94"><a href="#cb9-94" aria-hidden="true" tabindex="-1"></a>    <span class="co"># --- Health Spending vs Life Expectancy ---</span></span>
-<span id="cb9-95"><a href="#cb9-95" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-96"><a href="#cb9-96" aria-hidden="true" tabindex="-1"></a>    fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">14</span>, <span class="dv">8</span>))</span>
+<span id="cb9-59"><a href="#cb9-59" aria-hidden="true" tabindex="-1"></a>    <span class="co"># --- Life Expectancy Distribution ---</span></span>
+<span id="cb9-60"><a href="#cb9-60" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-61"><a href="#cb9-61" aria-hidden="true" tabindex="-1"></a>    fig, (ax1, ax2) <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">16</span>, <span class="dv">6</span>))</span>
+<span id="cb9-62"><a href="#cb9-62" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-63"><a href="#cb9-63" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Top 15</span></span>
+<span id="cb9-64"><a href="#cb9-64" aria-hidden="true" tabindex="-1"></a>    top_15 <span class="op">=</span> (</span>
+<span id="cb9-65"><a href="#cb9-65" aria-hidden="true" tabindex="-1"></a>        df_enriched</span>
+<span id="cb9-66"><a href="#cb9-66" aria-hidden="true" tabindex="-1"></a>        .nlargest(<span class="dv">15</span>, <span class="st">"life_expectancy"</span>)[[<span class="st">"location_key"</span>, <span class="st">"life_expectancy"</span>]]</span>
+<span id="cb9-67"><a href="#cb9-67" aria-hidden="true" tabindex="-1"></a>        .sort_values(<span class="st">"life_expectancy"</span>)</span>
+<span id="cb9-68"><a href="#cb9-68" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb9-69"><a href="#cb9-69" aria-hidden="true" tabindex="-1"></a>    ax1.barh(top_15[<span class="st">"location_key"</span>], top_15[<span class="st">"life_expectancy"</span>], color<span class="op">=</span><span class="st">"#2ecc71"</span>)</span>
+<span id="cb9-70"><a href="#cb9-70" aria-hidden="true" tabindex="-1"></a>    ax1.set_xlabel(<span class="st">"Life Expectancy (years)"</span>, fontsize<span class="op">=</span><span class="dv">12</span>, fontweight<span class="op">=</span><span class="st">"bold"</span>)</span>
+<span id="cb9-71"><a href="#cb9-71" aria-hidden="true" tabindex="-1"></a>    ax1.set_title(<span class="st">"Top 15 - Highest Life Expectancy"</span>, fontsize<span class="op">=</span><span class="dv">13</span>, fontweight<span class="op">=</span><span class="st">"bold"</span>)</span>
+<span id="cb9-72"><a href="#cb9-72" aria-hidden="true" tabindex="-1"></a>    ax1.set_xlim(<span class="dv">75</span>, <span class="dv">90</span>)</span>
+<span id="cb9-73"><a href="#cb9-73" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i, v <span class="kw">in</span> <span class="bu">enumerate</span>(top_15[<span class="st">"life_expectancy"</span>]):</span>
+<span id="cb9-74"><a href="#cb9-74" aria-hidden="true" tabindex="-1"></a>        ax1.text(v <span class="op">+</span> <span class="fl">0.2</span>, i, <span class="ss">f"</span><span class="sc">{</span>v<span class="sc">:.1f}</span><span class="ss">"</span>, va<span class="op">=</span><span class="st">"center"</span>, fontweight<span class="op">=</span><span class="st">"bold"</span>)</span>
+<span id="cb9-75"><a href="#cb9-75" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-76"><a href="#cb9-76" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Bottom 15</span></span>
+<span id="cb9-77"><a href="#cb9-77" aria-hidden="true" tabindex="-1"></a>    bottom_15 <span class="op">=</span> (</span>
+<span id="cb9-78"><a href="#cb9-78" aria-hidden="true" tabindex="-1"></a>        df_enriched</span>
+<span id="cb9-79"><a href="#cb9-79" aria-hidden="true" tabindex="-1"></a>        .nsmallest(<span class="dv">15</span>, <span class="st">"life_expectancy"</span>)[[<span class="st">"location_key"</span>, <span class="st">"life_expectancy"</span>]]</span>
+<span id="cb9-80"><a href="#cb9-80" aria-hidden="true" tabindex="-1"></a>        .sort_values(<span class="st">"life_expectancy"</span>)</span>
+<span id="cb9-81"><a href="#cb9-81" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb9-82"><a href="#cb9-82" aria-hidden="true" tabindex="-1"></a>    ax2.barh(bottom_15[<span class="st">"location_key"</span>], bottom_15[<span class="st">"life_expectancy"</span>], color<span class="op">=</span><span class="st">"#e74c3c"</span>)</span>
+<span id="cb9-83"><a href="#cb9-83" aria-hidden="true" tabindex="-1"></a>    ax2.set_xlabel(<span class="st">"Life Expectancy (years)"</span>, fontsize<span class="op">=</span><span class="dv">12</span>, fontweight<span class="op">=</span><span class="st">"bold"</span>)</span>
+<span id="cb9-84"><a href="#cb9-84" aria-hidden="true" tabindex="-1"></a>    ax2.set_title(<span class="st">"Bottom 15 - Lowest Life Expectancy"</span>, fontsize<span class="op">=</span><span class="dv">13</span>, fontweight<span class="op">=</span><span class="st">"bold"</span>)</span>
+<span id="cb9-85"><a href="#cb9-85" aria-hidden="true" tabindex="-1"></a>    ax2.set_xlim(<span class="dv">50</span>, <span class="dv">65</span>)</span>
+<span id="cb9-86"><a href="#cb9-86" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i, v <span class="kw">in</span> <span class="bu">enumerate</span>(bottom_15[<span class="st">"life_expectancy"</span>]):</span>
+<span id="cb9-87"><a href="#cb9-87" aria-hidden="true" tabindex="-1"></a>        ax2.text(v <span class="op">+</span> <span class="fl">0.2</span>, i, <span class="ss">f"</span><span class="sc">{</span>v<span class="sc">:.1f}</span><span class="ss">"</span>, va<span class="op">=</span><span class="st">"center"</span>, fontweight<span class="op">=</span><span class="st">"bold"</span>)</span>
+<span id="cb9-88"><a href="#cb9-88" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-89"><a href="#cb9-89" aria-hidden="true" tabindex="-1"></a>    plt.tight_layout()</span>
+<span id="cb9-90"><a href="#cb9-90" aria-hidden="true" tabindex="-1"></a>    plt.show()</span>
+<span id="cb9-91"><a href="#cb9-91" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-92"><a href="#cb9-92" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(</span>
+<span id="cb9-93"><a href="#cb9-93" aria-hidden="true" tabindex="-1"></a>        <span class="ss">f"They have a "</span></span>
+<span id="cb9-94"><a href="#cb9-94" aria-hidden="true" tabindex="-1"></a>        <span class="ss">f"</span><span class="sc">{</span>top_15[<span class="st">'life_expectancy'</span>]<span class="sc">.</span>iloc[<span class="op">-</span><span class="dv">1</span>] <span class="op">-</span> bottom_15[<span class="st">'life_expectancy'</span>]<span class="sc">.</span>iloc[<span class="dv">0</span>]<span class="sc">:.1f}</span><span class="ss"> "</span></span>
+<span id="cb9-95"><a href="#cb9-95" aria-hidden="true" tabindex="-1"></a>        <span class="ss">f"year global gap</span><span class="ch">\n</span><span class="ss">"</span></span>
+<span id="cb9-96"><a href="#cb9-96" aria-hidden="true" tabindex="-1"></a>    )</span>
 <span id="cb9-97"><a href="#cb9-97" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-98"><a href="#cb9-98" aria-hidden="true" tabindex="-1"></a>    scatter <span class="op">=</span> ax.scatter(</span>
-<span id="cb9-99"><a href="#cb9-99" aria-hidden="true" tabindex="-1"></a>        df_enriched[<span class="st">"health_expenditure_usd"</span>],</span>
-<span id="cb9-100"><a href="#cb9-100" aria-hidden="true" tabindex="-1"></a>        df_enriched[<span class="st">"life_expectancy"</span>],</span>
-<span id="cb9-101"><a href="#cb9-101" aria-hidden="true" tabindex="-1"></a>        s<span class="op">=</span><span class="dv">100</span>,</span>
-<span id="cb9-102"><a href="#cb9-102" aria-hidden="true" tabindex="-1"></a>        alpha<span class="op">=</span><span class="fl">0.6</span>,</span>
-<span id="cb9-103"><a href="#cb9-103" aria-hidden="true" tabindex="-1"></a>        c<span class="op">=</span>df_enriched[<span class="st">"infant_mortality_rate"</span>],</span>
-<span id="cb9-104"><a href="#cb9-104" aria-hidden="true" tabindex="-1"></a>        cmap<span class="op">=</span><span class="st">"viridis"</span>,</span>
-<span id="cb9-105"><a href="#cb9-105" aria-hidden="true" tabindex="-1"></a>        edgecolors<span class="op">=</span><span class="st">"black"</span>,</span>
-<span id="cb9-106"><a href="#cb9-106" aria-hidden="true" tabindex="-1"></a>        linewidth<span class="op">=</span><span class="fl">0.5</span>,</span>
-<span id="cb9-107"><a href="#cb9-107" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb9-108"><a href="#cb9-108" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-109"><a href="#cb9-109" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Trend line (simple linear fit)</span></span>
-<span id="cb9-110"><a href="#cb9-110" aria-hidden="true" tabindex="-1"></a>    x_vals <span class="op">=</span> df_enriched[<span class="st">"health_expenditure_usd"</span>].fillna(<span class="dv">0</span>)</span>
-<span id="cb9-111"><a href="#cb9-111" aria-hidden="true" tabindex="-1"></a>    y_vals <span class="op">=</span> df_enriched[<span class="st">"life_expectancy"</span>]</span>
-<span id="cb9-112"><a href="#cb9-112" aria-hidden="true" tabindex="-1"></a>    z <span class="op">=</span> np.polyfit(x_vals, y_vals, <span class="dv">1</span>)</span>
-<span id="cb9-113"><a href="#cb9-113" aria-hidden="true" tabindex="-1"></a>    p <span class="op">=</span> np.poly1d(z)</span>
-<span id="cb9-114"><a href="#cb9-114" aria-hidden="true" tabindex="-1"></a>    x_trend <span class="op">=</span> np.linspace(<span class="dv">0</span>, x_vals.<span class="bu">max</span>(), <span class="dv">100</span>)</span>
-<span id="cb9-115"><a href="#cb9-115" aria-hidden="true" tabindex="-1"></a>    ax.plot(x_trend, p(x_trend), <span class="st">"r--"</span>, alpha<span class="op">=</span><span class="fl">0.8</span>, linewidth<span class="op">=</span><span class="fl">2.5</span>, label<span class="op">=</span><span class="st">"Trend"</span>)</span>
-<span id="cb9-116"><a href="#cb9-116" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-117"><a href="#cb9-117" aria-hidden="true" tabindex="-1"></a>    ax.set_xlabel(<span class="st">"Health Expenditure (USD per capita)"</span>, fontsize<span class="op">=</span><span class="dv">12</span>, fontweight<span class="op">=</span><span class="st">"bold"</span>)</span>
-<span id="cb9-118"><a href="#cb9-118" aria-hidden="true" tabindex="-1"></a>    ax.set_ylabel(<span class="st">"Life Expectancy (years)"</span>, fontsize<span class="op">=</span><span class="dv">12</span>, fontweight<span class="op">=</span><span class="st">"bold"</span>)</span>
-<span id="cb9-119"><a href="#cb9-119" aria-hidden="true" tabindex="-1"></a>    ax.set_title(<span class="st">"Relationship: Health Spending vs Life Expectancy"</span>, fontsize<span class="op">=</span><span class="dv">13</span>, fontweight<span class="op">=</span><span class="st">"bold"</span>)</span>
-<span id="cb9-120"><a href="#cb9-120" aria-hidden="true" tabindex="-1"></a>    ax.set_xscale(<span class="st">"log"</span>)</span>
-<span id="cb9-121"><a href="#cb9-121" aria-hidden="true" tabindex="-1"></a>    ax.grid(<span class="va">True</span>, alpha<span class="op">=</span><span class="fl">0.3</span>)</span>
-<span id="cb9-122"><a href="#cb9-122" aria-hidden="true" tabindex="-1"></a>    ax.legend(fontsize<span class="op">=</span><span class="dv">11</span>)</span>
-<span id="cb9-123"><a href="#cb9-123" aria-hidden="true" tabindex="-1"></a>    cbar <span class="op">=</span> plt.colorbar(scatter, ax<span class="op">=</span>ax)</span>
-<span id="cb9-124"><a href="#cb9-124" aria-hidden="true" tabindex="-1"></a>    cbar.set_label(<span class="st">"Infant Mortality Rate"</span>, fontsize<span class="op">=</span><span class="dv">11</span>, fontweight<span class="op">=</span><span class="st">"bold"</span>)</span>
-<span id="cb9-125"><a href="#cb9-125" aria-hidden="true" tabindex="-1"></a>    plt.tight_layout()</span>
-<span id="cb9-126"><a href="#cb9-126" aria-hidden="true" tabindex="-1"></a>    plt.show()</span>
-<span id="cb9-127"><a href="#cb9-127" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-128"><a href="#cb9-128" aria-hidden="true" tabindex="-1"></a>    corr <span class="op">=</span> df_enriched[<span class="st">"health_expenditure_usd"</span>].corr(df_enriched[<span class="st">"life_expectancy"</span>])</span>
-<span id="cb9-129"><a href="#cb9-129" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Positive correlation between spending and life expectancy = </span><span class="sc">{</span>corr<span class="sc">:.4f}</span><span class="ch">\n</span><span class="ss">"</span>)</span>
-<span id="cb9-130"><a href="#cb9-130" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-131"><a href="#cb9-131" aria-hidden="true" tabindex="-1"></a>    <span class="co"># --- Correlation Heatmap ---</span></span>
-<span id="cb9-132"><a href="#cb9-132" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-133"><a href="#cb9-133" aria-hidden="true" tabindex="-1"></a>    corr_vars <span class="op">=</span> [</span>
-<span id="cb9-134"><a href="#cb9-134" aria-hidden="true" tabindex="-1"></a>        <span class="st">"life_expectancy"</span>, <span class="st">"health_expenditure_usd"</span>, <span class="st">"infant_mortality_rate"</span>,</span>
-<span id="cb9-135"><a href="#cb9-135" aria-hidden="true" tabindex="-1"></a>        <span class="st">"physicians_per_1000"</span>, <span class="st">"smoking_prevalence"</span>, <span class="st">"diabetes_prevalence"</span></span>
-<span id="cb9-136"><a href="#cb9-136" aria-hidden="true" tabindex="-1"></a>    ]</span>
-<span id="cb9-137"><a href="#cb9-137" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-138"><a href="#cb9-138" aria-hidden="true" tabindex="-1"></a>    corr_matrix <span class="op">=</span> df_enriched[corr_vars].corr()</span>
-<span id="cb9-139"><a href="#cb9-139" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-140"><a href="#cb9-140" aria-hidden="true" tabindex="-1"></a>    fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">8</span>))</span>
-<span id="cb9-141"><a href="#cb9-141" aria-hidden="true" tabindex="-1"></a>    sns.heatmap(</span>
-<span id="cb9-142"><a href="#cb9-142" aria-hidden="true" tabindex="-1"></a>        corr_matrix, annot<span class="op">=</span><span class="va">True</span>, fmt<span class="op">=</span><span class="st">".2f"</span>, cmap<span class="op">=</span><span class="st">"coolwarm"</span>, center<span class="op">=</span><span class="dv">0</span>,</span>
-<span id="cb9-143"><a href="#cb9-143" aria-hidden="true" tabindex="-1"></a>        square<span class="op">=</span><span class="va">True</span>, linewidths<span class="op">=</span><span class="fl">0.5</span>, cbar_kws<span class="op">=</span>{<span class="st">"shrink"</span>: <span class="fl">0.8</span>},</span>
-<span id="cb9-144"><a href="#cb9-144" aria-hidden="true" tabindex="-1"></a>        ax<span class="op">=</span>ax, vmin<span class="op">=-</span><span class="dv">1</span>, vmax<span class="op">=</span><span class="dv">1</span></span>
-<span id="cb9-145"><a href="#cb9-145" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb9-146"><a href="#cb9-146" aria-hidden="true" tabindex="-1"></a>    ax.set_title(<span class="st">"Correlation Matrix: Key Health Indicators"</span>, fontsize<span class="op">=</span><span class="dv">13</span>, fontweight<span class="op">=</span><span class="st">"bold"</span>)</span>
-<span id="cb9-147"><a href="#cb9-147" aria-hidden="true" tabindex="-1"></a>    plt.xticks(rotation<span class="op">=</span><span class="dv">45</span>, ha<span class="op">=</span><span class="st">"right"</span>)</span>
-<span id="cb9-148"><a href="#cb9-148" aria-hidden="true" tabindex="-1"></a>    plt.yticks(rotation<span class="op">=</span><span class="dv">0</span>)</span>
-<span id="cb9-149"><a href="#cb9-149" aria-hidden="true" tabindex="-1"></a>    plt.tight_layout()</span>
-<span id="cb9-150"><a href="#cb9-150" aria-hidden="true" tabindex="-1"></a>    plt.show()</span>
-<span id="cb9-151"><a href="#cb9-151" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-152"><a href="#cb9-152" aria-hidden="true" tabindex="-1"></a>    <span class="co"># --- Country Health Status Distribution ---</span></span>
-<span id="cb9-153"><a href="#cb9-153" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-154"><a href="#cb9-154" aria-hidden="true" tabindex="-1"></a>    df_enriched[<span class="st">"health_status"</span>] <span class="op">=</span> pd.cut(</span>
-<span id="cb9-155"><a href="#cb9-155" aria-hidden="true" tabindex="-1"></a>        df_enriched[<span class="st">"life_expectancy"</span>],</span>
-<span id="cb9-156"><a href="#cb9-156" aria-hidden="true" tabindex="-1"></a>        bins<span class="op">=</span>[<span class="dv">0</span>, <span class="dv">65</span>, <span class="dv">75</span>, <span class="dv">80</span>, <span class="dv">100</span>],</span>
-<span id="cb9-157"><a href="#cb9-157" aria-hidden="true" tabindex="-1"></a>        labels<span class="op">=</span>[<span class="st">"Low (≤65)"</span>, <span class="st">"Medium (65-75)"</span>, <span class="st">"High (75-80)"</span>, <span class="st">"Very High (&gt;80)"</span>],</span>
-<span id="cb9-158"><a href="#cb9-158" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb9-159"><a href="#cb9-159" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-160"><a href="#cb9-160" aria-hidden="true" tabindex="-1"></a>    health_counts <span class="op">=</span> df_enriched[<span class="st">"health_status"</span>].value_counts().sort_index()</span>
-<span id="cb9-161"><a href="#cb9-161" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-162"><a href="#cb9-162" aria-hidden="true" tabindex="-1"></a>    fig, (ax1, ax2) <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">15</span>, <span class="dv">6</span>))</span>
+<span id="cb9-98"><a href="#cb9-98" aria-hidden="true" tabindex="-1"></a>    <span class="co"># --- Health Spending vs Life Expectancy ---</span></span>
+<span id="cb9-99"><a href="#cb9-99" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-100"><a href="#cb9-100" aria-hidden="true" tabindex="-1"></a>    fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">14</span>, <span class="dv">8</span>))</span>
+<span id="cb9-101"><a href="#cb9-101" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-102"><a href="#cb9-102" aria-hidden="true" tabindex="-1"></a>    scatter <span class="op">=</span> ax.scatter(</span>
+<span id="cb9-103"><a href="#cb9-103" aria-hidden="true" tabindex="-1"></a>        df_enriched[<span class="st">"health_expenditure_usd"</span>],</span>
+<span id="cb9-104"><a href="#cb9-104" aria-hidden="true" tabindex="-1"></a>        df_enriched[<span class="st">"life_expectancy"</span>],</span>
+<span id="cb9-105"><a href="#cb9-105" aria-hidden="true" tabindex="-1"></a>        s<span class="op">=</span><span class="dv">100</span>,</span>
+<span id="cb9-106"><a href="#cb9-106" aria-hidden="true" tabindex="-1"></a>        alpha<span class="op">=</span><span class="fl">0.6</span>,</span>
+<span id="cb9-107"><a href="#cb9-107" aria-hidden="true" tabindex="-1"></a>        c<span class="op">=</span>df_enriched[<span class="st">"infant_mortality_rate"</span>],</span>
+<span id="cb9-108"><a href="#cb9-108" aria-hidden="true" tabindex="-1"></a>        cmap<span class="op">=</span><span class="st">"viridis"</span>,</span>
+<span id="cb9-109"><a href="#cb9-109" aria-hidden="true" tabindex="-1"></a>        edgecolors<span class="op">=</span><span class="st">"black"</span>,</span>
+<span id="cb9-110"><a href="#cb9-110" aria-hidden="true" tabindex="-1"></a>        linewidth<span class="op">=</span><span class="fl">0.5</span>,</span>
+<span id="cb9-111"><a href="#cb9-111" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb9-112"><a href="#cb9-112" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-113"><a href="#cb9-113" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Trend line (simple linear fit)</span></span>
+<span id="cb9-114"><a href="#cb9-114" aria-hidden="true" tabindex="-1"></a>    x_vals <span class="op">=</span> df_enriched[<span class="st">"health_expenditure_usd"</span>].fillna(<span class="dv">0</span>)</span>
+<span id="cb9-115"><a href="#cb9-115" aria-hidden="true" tabindex="-1"></a>    y_vals <span class="op">=</span> df_enriched[<span class="st">"life_expectancy"</span>]</span>
+<span id="cb9-116"><a href="#cb9-116" aria-hidden="true" tabindex="-1"></a>    z <span class="op">=</span> np.polyfit(x_vals, y_vals, <span class="dv">1</span>)</span>
+<span id="cb9-117"><a href="#cb9-117" aria-hidden="true" tabindex="-1"></a>    p <span class="op">=</span> np.poly1d(z)</span>
+<span id="cb9-118"><a href="#cb9-118" aria-hidden="true" tabindex="-1"></a>    x_trend <span class="op">=</span> np.linspace(<span class="dv">0</span>, x_vals.<span class="bu">max</span>(), <span class="dv">100</span>)</span>
+<span id="cb9-119"><a href="#cb9-119" aria-hidden="true" tabindex="-1"></a>    ax.plot(x_trend, p(x_trend), <span class="st">"r--"</span>, alpha<span class="op">=</span><span class="fl">0.8</span>, linewidth<span class="op">=</span><span class="fl">2.5</span>, label<span class="op">=</span><span class="st">"Trend"</span>)</span>
+<span id="cb9-120"><a href="#cb9-120" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-121"><a href="#cb9-121" aria-hidden="true" tabindex="-1"></a>    ax.set_xlabel(<span class="st">"Health Expenditure (USD per capita)"</span>, fontsize<span class="op">=</span><span class="dv">12</span>, fontweight<span class="op">=</span><span class="st">"bold"</span>)</span>
+<span id="cb9-122"><a href="#cb9-122" aria-hidden="true" tabindex="-1"></a>    ax.set_ylabel(<span class="st">"Life Expectancy (years)"</span>, fontsize<span class="op">=</span><span class="dv">12</span>, fontweight<span class="op">=</span><span class="st">"bold"</span>)</span>
+<span id="cb9-123"><a href="#cb9-123" aria-hidden="true" tabindex="-1"></a>    ax.set_title(<span class="st">"Relationship: Health Spending vs Life Expectancy"</span>, fontsize<span class="op">=</span><span class="dv">13</span>, fontweight<span class="op">=</span><span class="st">"bold"</span>)</span>
+<span id="cb9-124"><a href="#cb9-124" aria-hidden="true" tabindex="-1"></a>    ax.set_xscale(<span class="st">"log"</span>)</span>
+<span id="cb9-125"><a href="#cb9-125" aria-hidden="true" tabindex="-1"></a>    ax.grid(<span class="va">True</span>, alpha<span class="op">=</span><span class="fl">0.3</span>)</span>
+<span id="cb9-126"><a href="#cb9-126" aria-hidden="true" tabindex="-1"></a>    ax.legend(fontsize<span class="op">=</span><span class="dv">11</span>)</span>
+<span id="cb9-127"><a href="#cb9-127" aria-hidden="true" tabindex="-1"></a>    cbar <span class="op">=</span> plt.colorbar(scatter, ax<span class="op">=</span>ax)</span>
+<span id="cb9-128"><a href="#cb9-128" aria-hidden="true" tabindex="-1"></a>    cbar.set_label(<span class="st">"Infant Mortality Rate"</span>, fontsize<span class="op">=</span><span class="dv">11</span>, fontweight<span class="op">=</span><span class="st">"bold"</span>)</span>
+<span id="cb9-129"><a href="#cb9-129" aria-hidden="true" tabindex="-1"></a>    plt.tight_layout()</span>
+<span id="cb9-130"><a href="#cb9-130" aria-hidden="true" tabindex="-1"></a>    plt.show()</span>
+<span id="cb9-131"><a href="#cb9-131" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-132"><a href="#cb9-132" aria-hidden="true" tabindex="-1"></a>    corr <span class="op">=</span> df_enriched[<span class="st">"health_expenditure_usd"</span>].corr(df_enriched[<span class="st">"life_expectancy"</span>])</span>
+<span id="cb9-133"><a href="#cb9-133" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Positive correlation between spending and life expectancy = </span><span class="sc">{</span>corr<span class="sc">:.4f}</span><span class="ch">\n</span><span class="ss">"</span>)</span>
+<span id="cb9-134"><a href="#cb9-134" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-135"><a href="#cb9-135" aria-hidden="true" tabindex="-1"></a>    <span class="co"># --- Correlation Heatmap ---</span></span>
+<span id="cb9-136"><a href="#cb9-136" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-137"><a href="#cb9-137" aria-hidden="true" tabindex="-1"></a>    corr_vars <span class="op">=</span> [</span>
+<span id="cb9-138"><a href="#cb9-138" aria-hidden="true" tabindex="-1"></a>        <span class="st">"life_expectancy"</span>, <span class="st">"health_expenditure_usd"</span>, <span class="st">"infant_mortality_rate"</span>,</span>
+<span id="cb9-139"><a href="#cb9-139" aria-hidden="true" tabindex="-1"></a>        <span class="st">"physicians_per_1000"</span>, <span class="st">"smoking_prevalence"</span>, <span class="st">"diabetes_prevalence"</span></span>
+<span id="cb9-140"><a href="#cb9-140" aria-hidden="true" tabindex="-1"></a>    ]</span>
+<span id="cb9-141"><a href="#cb9-141" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-142"><a href="#cb9-142" aria-hidden="true" tabindex="-1"></a>    corr_matrix <span class="op">=</span> df_enriched[corr_vars].corr()</span>
+<span id="cb9-143"><a href="#cb9-143" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-144"><a href="#cb9-144" aria-hidden="true" tabindex="-1"></a>    fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">8</span>))</span>
+<span id="cb9-145"><a href="#cb9-145" aria-hidden="true" tabindex="-1"></a>    sns.heatmap(</span>
+<span id="cb9-146"><a href="#cb9-146" aria-hidden="true" tabindex="-1"></a>        corr_matrix, annot<span class="op">=</span><span class="va">True</span>, fmt<span class="op">=</span><span class="st">".2f"</span>, cmap<span class="op">=</span><span class="st">"coolwarm"</span>, center<span class="op">=</span><span class="dv">0</span>,</span>
+<span id="cb9-147"><a href="#cb9-147" aria-hidden="true" tabindex="-1"></a>        square<span class="op">=</span><span class="va">True</span>, linewidths<span class="op">=</span><span class="fl">0.5</span>, cbar_kws<span class="op">=</span>{<span class="st">"shrink"</span>: <span class="fl">0.8</span>},</span>
+<span id="cb9-148"><a href="#cb9-148" aria-hidden="true" tabindex="-1"></a>        ax<span class="op">=</span>ax, vmin<span class="op">=-</span><span class="dv">1</span>, vmax<span class="op">=</span><span class="dv">1</span></span>
+<span id="cb9-149"><a href="#cb9-149" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb9-150"><a href="#cb9-150" aria-hidden="true" tabindex="-1"></a>    ax.set_title(<span class="st">"Correlation Matrix: Key Health Indicators"</span>, fontsize<span class="op">=</span><span class="dv">13</span>, fontweight<span class="op">=</span><span class="st">"bold"</span>)</span>
+<span id="cb9-151"><a href="#cb9-151" aria-hidden="true" tabindex="-1"></a>    plt.xticks(rotation<span class="op">=</span><span class="dv">45</span>, ha<span class="op">=</span><span class="st">"right"</span>)</span>
+<span id="cb9-152"><a href="#cb9-152" aria-hidden="true" tabindex="-1"></a>    plt.yticks(rotation<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb9-153"><a href="#cb9-153" aria-hidden="true" tabindex="-1"></a>    plt.tight_layout()</span>
+<span id="cb9-154"><a href="#cb9-154" aria-hidden="true" tabindex="-1"></a>    plt.show()</span>
+<span id="cb9-155"><a href="#cb9-155" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-156"><a href="#cb9-156" aria-hidden="true" tabindex="-1"></a>    <span class="co"># --- Country Health Status Distribution ---</span></span>
+<span id="cb9-157"><a href="#cb9-157" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-158"><a href="#cb9-158" aria-hidden="true" tabindex="-1"></a>    df_enriched[<span class="st">"health_status"</span>] <span class="op">=</span> pd.cut(</span>
+<span id="cb9-159"><a href="#cb9-159" aria-hidden="true" tabindex="-1"></a>        df_enriched[<span class="st">"life_expectancy"</span>],</span>
+<span id="cb9-160"><a href="#cb9-160" aria-hidden="true" tabindex="-1"></a>        bins<span class="op">=</span>[<span class="dv">0</span>, <span class="dv">65</span>, <span class="dv">75</span>, <span class="dv">80</span>, <span class="dv">100</span>],</span>
+<span id="cb9-161"><a href="#cb9-161" aria-hidden="true" tabindex="-1"></a>        labels<span class="op">=</span>[<span class="st">"Low (≤65)"</span>, <span class="st">"Medium (65-75)"</span>, <span class="st">"High (75-80)"</span>, <span class="st">"Very High (&gt;80)"</span>],</span>
+<span id="cb9-162"><a href="#cb9-162" aria-hidden="true" tabindex="-1"></a>    )</span>
 <span id="cb9-163"><a href="#cb9-163" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-164"><a href="#cb9-164" aria-hidden="true" tabindex="-1"></a>    colors <span class="op">=</span> [<span class="st">"#e74c3c"</span>, <span class="st">"#f39c12"</span>, <span class="st">"#3498db"</span>, <span class="st">"#2ecc71"</span>]</span>
-<span id="cb9-165"><a href="#cb9-165" aria-hidden="true" tabindex="-1"></a>    ax1.pie(</span>
-<span id="cb9-166"><a href="#cb9-166" aria-hidden="true" tabindex="-1"></a>        health_counts, labels<span class="op">=</span>health_counts.index, autopct<span class="op">=</span><span class="st">"</span><span class="sc">%1.1f%%</span><span class="st">"</span>,</span>
-<span id="cb9-167"><a href="#cb9-167" aria-hidden="true" tabindex="-1"></a>        colors<span class="op">=</span>colors, startangle<span class="op">=</span><span class="dv">90</span>, textprops<span class="op">=</span>{<span class="st">"fontsize"</span>: <span class="dv">11</span>, <span class="st">"fontweight"</span>: <span class="st">"bold"</span>}</span>
-<span id="cb9-168"><a href="#cb9-168" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb9-169"><a href="#cb9-169" aria-hidden="true" tabindex="-1"></a>    ax1.set_title(<span class="st">"Distribution by Health Status"</span>, fontsize<span class="op">=</span><span class="dv">13</span>, fontweight<span class="op">=</span><span class="st">"bold"</span>)</span>
-<span id="cb9-170"><a href="#cb9-170" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-171"><a href="#cb9-171" aria-hidden="true" tabindex="-1"></a>    ax2.bar(<span class="bu">range</span>(<span class="bu">len</span>(health_counts)), health_counts.values,</span>
-<span id="cb9-172"><a href="#cb9-172" aria-hidden="true" tabindex="-1"></a>            color<span class="op">=</span>colors, edgecolor<span class="op">=</span><span class="st">"black"</span>, linewidth<span class="op">=</span><span class="fl">1.5</span>)</span>
-<span id="cb9-173"><a href="#cb9-173" aria-hidden="true" tabindex="-1"></a>    ax2.set_xticks(<span class="bu">range</span>(<span class="bu">len</span>(health_counts)))</span>
-<span id="cb9-174"><a href="#cb9-174" aria-hidden="true" tabindex="-1"></a>    ax2.set_xticklabels(health_counts.index, fontsize<span class="op">=</span><span class="dv">11</span>, fontweight<span class="op">=</span><span class="st">"bold"</span>)</span>
-<span id="cb9-175"><a href="#cb9-175" aria-hidden="true" tabindex="-1"></a>    ax2.set_ylabel(<span class="st">"Number of Countries"</span>, fontsize<span class="op">=</span><span class="dv">12</span>, fontweight<span class="op">=</span><span class="st">"bold"</span>)</span>
-<span id="cb9-176"><a href="#cb9-176" aria-hidden="true" tabindex="-1"></a>    ax2.set_title(<span class="st">"Country Count"</span>, fontsize<span class="op">=</span><span class="dv">13</span>, fontweight<span class="op">=</span><span class="st">"bold"</span>)</span>
-<span id="cb9-177"><a href="#cb9-177" aria-hidden="true" tabindex="-1"></a>    ax2.grid(axis<span class="op">=</span><span class="st">"y"</span>, alpha<span class="op">=</span><span class="fl">0.3</span>)</span>
-<span id="cb9-178"><a href="#cb9-178" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i, v <span class="kw">in</span> <span class="bu">enumerate</span>(health_counts.values):</span>
-<span id="cb9-179"><a href="#cb9-179" aria-hidden="true" tabindex="-1"></a>        ax2.text(i, v <span class="op">+</span> <span class="dv">1</span>, <span class="bu">str</span>(v), ha<span class="op">=</span><span class="st">"center"</span>, fontweight<span class="op">=</span><span class="st">"bold"</span>)</span>
-<span id="cb9-180"><a href="#cb9-180" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-181"><a href="#cb9-181" aria-hidden="true" tabindex="-1"></a>    plt.tight_layout()</span>
-<span id="cb9-182"><a href="#cb9-182" aria-hidden="true" tabindex="-1"></a>    plt.show()</span>
-<span id="cb9-183"><a href="#cb9-183" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-184"><a href="#cb9-184" aria-hidden="true" tabindex="-1"></a>    <span class="co"># --- Mortality Indicators Comparison ---</span></span>
-<span id="cb9-185"><a href="#cb9-185" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-186"><a href="#cb9-186" aria-hidden="true" tabindex="-1"></a>    fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">14</span>, <span class="dv">6</span>))</span>
+<span id="cb9-164"><a href="#cb9-164" aria-hidden="true" tabindex="-1"></a>    health_counts <span class="op">=</span> df_enriched[<span class="st">"health_status"</span>].value_counts().sort_index()</span>
+<span id="cb9-165"><a href="#cb9-165" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-166"><a href="#cb9-166" aria-hidden="true" tabindex="-1"></a>    fig, (ax1, ax2) <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">15</span>, <span class="dv">6</span>))</span>
+<span id="cb9-167"><a href="#cb9-167" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-168"><a href="#cb9-168" aria-hidden="true" tabindex="-1"></a>    colors <span class="op">=</span> [<span class="st">"#e74c3c"</span>, <span class="st">"#f39c12"</span>, <span class="st">"#3498db"</span>, <span class="st">"#2ecc71"</span>]</span>
+<span id="cb9-169"><a href="#cb9-169" aria-hidden="true" tabindex="-1"></a>    ax1.pie(</span>
+<span id="cb9-170"><a href="#cb9-170" aria-hidden="true" tabindex="-1"></a>        health_counts, labels<span class="op">=</span>health_counts.index, autopct<span class="op">=</span><span class="st">"</span><span class="sc">%1.1f%%</span><span class="st">"</span>,</span>
+<span id="cb9-171"><a href="#cb9-171" aria-hidden="true" tabindex="-1"></a>        colors<span class="op">=</span>colors, startangle<span class="op">=</span><span class="dv">90</span>, textprops<span class="op">=</span>{<span class="st">"fontsize"</span>: <span class="dv">11</span>, <span class="st">"fontweight"</span>: <span class="st">"bold"</span>}</span>
+<span id="cb9-172"><a href="#cb9-172" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb9-173"><a href="#cb9-173" aria-hidden="true" tabindex="-1"></a>    ax1.set_title(<span class="st">"Distribution by Health Status"</span>, fontsize<span class="op">=</span><span class="dv">13</span>, fontweight<span class="op">=</span><span class="st">"bold"</span>)</span>
+<span id="cb9-174"><a href="#cb9-174" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-175"><a href="#cb9-175" aria-hidden="true" tabindex="-1"></a>    ax2.bar(<span class="bu">range</span>(<span class="bu">len</span>(health_counts)), health_counts.values,</span>
+<span id="cb9-176"><a href="#cb9-176" aria-hidden="true" tabindex="-1"></a>            color<span class="op">=</span>colors, edgecolor<span class="op">=</span><span class="st">"black"</span>, linewidth<span class="op">=</span><span class="fl">1.5</span>)</span>
+<span id="cb9-177"><a href="#cb9-177" aria-hidden="true" tabindex="-1"></a>    ax2.set_xticks(<span class="bu">range</span>(<span class="bu">len</span>(health_counts)))</span>
+<span id="cb9-178"><a href="#cb9-178" aria-hidden="true" tabindex="-1"></a>    ax2.set_xticklabels(health_counts.index, fontsize<span class="op">=</span><span class="dv">11</span>, fontweight<span class="op">=</span><span class="st">"bold"</span>)</span>
+<span id="cb9-179"><a href="#cb9-179" aria-hidden="true" tabindex="-1"></a>    ax2.set_ylabel(<span class="st">"Number of Countries"</span>, fontsize<span class="op">=</span><span class="dv">12</span>, fontweight<span class="op">=</span><span class="st">"bold"</span>)</span>
+<span id="cb9-180"><a href="#cb9-180" aria-hidden="true" tabindex="-1"></a>    ax2.set_title(<span class="st">"Country Count"</span>, fontsize<span class="op">=</span><span class="dv">13</span>, fontweight<span class="op">=</span><span class="st">"bold"</span>)</span>
+<span id="cb9-181"><a href="#cb9-181" aria-hidden="true" tabindex="-1"></a>    ax2.grid(axis<span class="op">=</span><span class="st">"y"</span>, alpha<span class="op">=</span><span class="fl">0.3</span>)</span>
+<span id="cb9-182"><a href="#cb9-182" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i, v <span class="kw">in</span> <span class="bu">enumerate</span>(health_counts.values):</span>
+<span id="cb9-183"><a href="#cb9-183" aria-hidden="true" tabindex="-1"></a>        ax2.text(i, v <span class="op">+</span> <span class="dv">1</span>, <span class="bu">str</span>(v), ha<span class="op">=</span><span class="st">"center"</span>, fontweight<span class="op">=</span><span class="st">"bold"</span>)</span>
+<span id="cb9-184"><a href="#cb9-184" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-185"><a href="#cb9-185" aria-hidden="true" tabindex="-1"></a>    plt.tight_layout()</span>
+<span id="cb9-186"><a href="#cb9-186" aria-hidden="true" tabindex="-1"></a>    plt.show()</span>
 <span id="cb9-187"><a href="#cb9-187" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-188"><a href="#cb9-188" aria-hidden="true" tabindex="-1"></a>    mortality_data <span class="op">=</span> [</span>
-<span id="cb9-189"><a href="#cb9-189" aria-hidden="true" tabindex="-1"></a>        df_enriched[<span class="st">"infant_mortality_rate"</span>],</span>
-<span id="cb9-190"><a href="#cb9-190" aria-hidden="true" tabindex="-1"></a>        df_enriched[<span class="st">"adult_male_mortality_rate"</span>],</span>
-<span id="cb9-191"><a href="#cb9-191" aria-hidden="true" tabindex="-1"></a>        df_enriched[<span class="st">"adult_female_mortality_rate"</span>],</span>
-<span id="cb9-192"><a href="#cb9-192" aria-hidden="true" tabindex="-1"></a>        df_enriched[<span class="st">"pollution_mortality_rate"</span>],</span>
-<span id="cb9-193"><a href="#cb9-193" aria-hidden="true" tabindex="-1"></a>    ]</span>
-<span id="cb9-194"><a href="#cb9-194" aria-hidden="true" tabindex="-1"></a>    labels <span class="op">=</span> [<span class="st">"Infant"</span>, <span class="st">"Adult Male"</span>, <span class="st">"Adult Female"</span>, <span class="st">"Pollution"</span>]</span>
-<span id="cb9-195"><a href="#cb9-195" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-196"><a href="#cb9-196" aria-hidden="true" tabindex="-1"></a>    ax.boxplot(</span>
-<span id="cb9-197"><a href="#cb9-197" aria-hidden="true" tabindex="-1"></a>        mortality_data,</span>
-<span id="cb9-198"><a href="#cb9-198" aria-hidden="true" tabindex="-1"></a>        labels<span class="op">=</span>labels,</span>
-<span id="cb9-199"><a href="#cb9-199" aria-hidden="true" tabindex="-1"></a>        patch_artist<span class="op">=</span><span class="va">True</span>,</span>
-<span id="cb9-200"><a href="#cb9-200" aria-hidden="true" tabindex="-1"></a>        medianprops<span class="op">=</span><span class="bu">dict</span>(color<span class="op">=</span><span class="st">"red"</span>, linewidth<span class="op">=</span><span class="dv">2</span>),</span>
-<span id="cb9-201"><a href="#cb9-201" aria-hidden="true" tabindex="-1"></a>        boxprops<span class="op">=</span><span class="bu">dict</span>(facecolor<span class="op">=</span><span class="st">"lightblue"</span>, alpha<span class="op">=</span><span class="fl">0.7</span>),</span>
-<span id="cb9-202"><a href="#cb9-202" aria-hidden="true" tabindex="-1"></a>        whiskerprops<span class="op">=</span><span class="bu">dict</span>(linewidth<span class="op">=</span><span class="fl">1.5</span>),</span>
-<span id="cb9-203"><a href="#cb9-203" aria-hidden="true" tabindex="-1"></a>        capprops<span class="op">=</span><span class="bu">dict</span>(linewidth<span class="op">=</span><span class="fl">1.5</span>),</span>
-<span id="cb9-204"><a href="#cb9-204" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb9-205"><a href="#cb9-205" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-206"><a href="#cb9-206" aria-hidden="true" tabindex="-1"></a>    ax.set_ylabel(<span class="st">"Mortality Rate (per 1000)"</span>, fontsize<span class="op">=</span><span class="dv">12</span>, fontweight<span class="op">=</span><span class="st">"bold"</span>)</span>
-<span id="cb9-207"><a href="#cb9-207" aria-hidden="true" tabindex="-1"></a>    ax.set_title(<span class="st">"Global Distribution of Mortality Indicators"</span>, fontsize<span class="op">=</span><span class="dv">13</span>, fontweight<span class="op">=</span><span class="st">"bold"</span>)</span>
-<span id="cb9-208"><a href="#cb9-208" aria-hidden="true" tabindex="-1"></a>    ax.grid(axis<span class="op">=</span><span class="st">"y"</span>, alpha<span class="op">=</span><span class="fl">0.3</span>)</span>
-<span id="cb9-209"><a href="#cb9-209" aria-hidden="true" tabindex="-1"></a>    plt.tight_layout()</span>
-<span id="cb9-210"><a href="#cb9-210" aria-hidden="true" tabindex="-1"></a>    plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb9-188"><a href="#cb9-188" aria-hidden="true" tabindex="-1"></a>    <span class="co"># --- Mortality Indicators Comparison ---</span></span>
+<span id="cb9-189"><a href="#cb9-189" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-190"><a href="#cb9-190" aria-hidden="true" tabindex="-1"></a>    fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">14</span>, <span class="dv">6</span>))</span>
+<span id="cb9-191"><a href="#cb9-191" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-192"><a href="#cb9-192" aria-hidden="true" tabindex="-1"></a>    mortality_data <span class="op">=</span> [</span>
+<span id="cb9-193"><a href="#cb9-193" aria-hidden="true" tabindex="-1"></a>        df_enriched[<span class="st">"infant_mortality_rate"</span>],</span>
+<span id="cb9-194"><a href="#cb9-194" aria-hidden="true" tabindex="-1"></a>        df_enriched[<span class="st">"adult_male_mortality_rate"</span>],</span>
+<span id="cb9-195"><a href="#cb9-195" aria-hidden="true" tabindex="-1"></a>        df_enriched[<span class="st">"adult_female_mortality_rate"</span>],</span>
+<span id="cb9-196"><a href="#cb9-196" aria-hidden="true" tabindex="-1"></a>        df_enriched[<span class="st">"pollution_mortality_rate"</span>],</span>
+<span id="cb9-197"><a href="#cb9-197" aria-hidden="true" tabindex="-1"></a>    ]</span>
+<span id="cb9-198"><a href="#cb9-198" aria-hidden="true" tabindex="-1"></a>    labels <span class="op">=</span> [<span class="st">"Infant"</span>, <span class="st">"Adult Male"</span>, <span class="st">"Adult Female"</span>, <span class="st">"Pollution"</span>]</span>
+<span id="cb9-199"><a href="#cb9-199" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-200"><a href="#cb9-200" aria-hidden="true" tabindex="-1"></a>    ax.boxplot(</span>
+<span id="cb9-201"><a href="#cb9-201" aria-hidden="true" tabindex="-1"></a>        mortality_data,</span>
+<span id="cb9-202"><a href="#cb9-202" aria-hidden="true" tabindex="-1"></a>        labels<span class="op">=</span>labels,</span>
+<span id="cb9-203"><a href="#cb9-203" aria-hidden="true" tabindex="-1"></a>        patch_artist<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb9-204"><a href="#cb9-204" aria-hidden="true" tabindex="-1"></a>        medianprops<span class="op">=</span><span class="bu">dict</span>(color<span class="op">=</span><span class="st">"red"</span>, linewidth<span class="op">=</span><span class="dv">2</span>),</span>
+<span id="cb9-205"><a href="#cb9-205" aria-hidden="true" tabindex="-1"></a>        boxprops<span class="op">=</span><span class="bu">dict</span>(facecolor<span class="op">=</span><span class="st">"lightblue"</span>, alpha<span class="op">=</span><span class="fl">0.7</span>),</span>
+<span id="cb9-206"><a href="#cb9-206" aria-hidden="true" tabindex="-1"></a>        whiskerprops<span class="op">=</span><span class="bu">dict</span>(linewidth<span class="op">=</span><span class="fl">1.5</span>),</span>
+<span id="cb9-207"><a href="#cb9-207" aria-hidden="true" tabindex="-1"></a>        capprops<span class="op">=</span><span class="bu">dict</span>(linewidth<span class="op">=</span><span class="fl">1.5</span>),</span>
+<span id="cb9-208"><a href="#cb9-208" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb9-209"><a href="#cb9-209" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-210"><a href="#cb9-210" aria-hidden="true" tabindex="-1"></a>    ax.set_ylabel(<span class="st">"Mortality Rate (per 1000)"</span>, fontsize<span class="op">=</span><span class="dv">12</span>, fontweight<span class="op">=</span><span class="st">"bold"</span>)</span>
+<span id="cb9-211"><a href="#cb9-211" aria-hidden="true" tabindex="-1"></a>    ax.set_title(<span class="st">"Global Distribution of Mortality Indicators"</span>, fontsize<span class="op">=</span><span class="dv">13</span>, fontweight<span class="op">=</span><span class="st">"bold"</span>)</span>
+<span id="cb9-212"><a href="#cb9-212" aria-hidden="true" tabindex="-1"></a>    ax.grid(axis<span class="op">=</span><span class="st">"y"</span>, alpha<span class="op">=</span><span class="fl">0.3</span>)</span>
+<span id="cb9-213"><a href="#cb9-213" aria-hidden="true" tabindex="-1"></a>    plt.tight_layout()</span>
+<span id="cb9-214"><a href="#cb9-214" aria-hidden="true" tabindex="-1"></a>    plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
-<div class="cell-output cell-output-error">
-<div class="ansi-escaped-output">
-<pre><span class="ansi-red-fg">---------------------------------------------------------------------------</span>
-<span class="ansi-red-fg">NameError</span>                                 Traceback (most recent call last)
-<span class="ansi-cyan-fg">Cell</span><span class="ansi-cyan-fg"> </span><span class="ansi-green-fg">In[15]</span><span class="ansi-green-fg">, line 19</span>
-<span class="ansi-green-fg">      1</span> <span style="font-style:italic;color:rgb(95,135,135)"># ==============================</span>
-<span class="ansi-green-fg">      2</span> <span style="font-style:italic;color:rgb(95,135,135)"># 4. ANALYSIS &amp; PLOTS</span>
-<span class="ansi-green-fg">      3</span> <span style="font-style:italic;color:rgb(95,135,135)"># ==============================</span>
-<span class="ansi-green-fg">      4</span> 
-<span class="ansi-green-fg">      5</span> <span style="font-style:italic;color:rgb(95,135,135)"># Make sure required columns exist or handle missing:</span>
-<span class="ansi-green-fg">      6</span> required_cols = [
-<span class="ansi-green-fg">      7</span>     <span class="ansi-yellow-fg">"</span><span class="ansi-yellow-fg">life_expectancy</span><span class="ansi-yellow-fg">"</span>,
-<span class="ansi-green-fg">      8</span>     <span class="ansi-yellow-fg">"</span><span class="ansi-yellow-fg">infant_mortality_rate</span><span class="ansi-yellow-fg">"</span>,
-<span class="ansi-green-fg">   (...)</span><span class="ansi-green-fg">     16</span>     <span class="ansi-yellow-fg">"</span><span class="ansi-yellow-fg">diabetes_prevalence</span><span class="ansi-yellow-fg">"</span>
-<span class="ansi-green-fg">     17</span> ]
-<span class="ansi-green-fg">---&gt; </span><span class="ansi-green-fg">19</span> missing_cols = [c <span style="font-weight:bold;color:rgb(0,135,0)">for</span> c <span style="font-weight:bold;color:rgb(175,0,255)">in</span> required_cols <span style="font-weight:bold;color:rgb(0,135,0)">if</span> c <span style="font-weight:bold;color:rgb(175,0,255)">not</span> <span style="font-weight:bold;color:rgb(175,0,255)">in</span> <span class="ansi-yellow-bg">df_enriched</span>.columns]
-<span class="ansi-green-fg">     20</span> <span style="font-weight:bold;color:rgb(0,135,0)">if</span> missing_cols:
-<span class="ansi-green-fg">     21</span>     <span style="color:rgb(0,135,0)">print</span>(<span class="ansi-yellow-fg">"</span><span class="ansi-yellow-fg">⚠ WARNING: The following columns are missing from df_enriched:</span><span class="ansi-yellow-fg">"</span>)
+<div class="cell-output cell-output-stdout">
+<pre><code>Loaded df_enriched from data/df_enriched.csv
+Life Expectancy Statistics (in years):
+  Mean:      77.82
+  Median:    77.77
+  Std Dev:   7.60
+  Min:       52.80
+  25th %ile: 75.85
+  75th %ile: 79.75
+  Max:       401.31
 
-<span class="ansi-red-fg">NameError</span>: name 'df_enriched' is not defined</pre>
+Infant Mortality Rate (per 1000 births):
+  Mean:   21.38
+  Median: 14.00
+  Min:    1.40
+  Max:    84.50
+
+Health Expenditure (USD per capita):
+  Mean:      $1081
+  Median:    $336
+  Min:       $19
+  Max:       $10246
+  90th:      $3898
+</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="all_files/figure-html/cell-9-output-2.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>They have a 348.5 year global gap
+</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="all_files/figure-html/cell-9-output-4.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Positive correlation between spending and life expectancy = 0.6012
+</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="all_files/figure-html/cell-9-output-6.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="all_files/figure-html/cell-9-output-7.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="all_files/figure-html/cell-9-output-8.png" class="img-fluid figure-img"></p>
+</figure>
 </div>
 </div>
 </div>

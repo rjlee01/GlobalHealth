@@ -68,27 +68,106 @@ These are explored in more depth on the **Analysis & Visuals** page.
 ## 3. Interactive Exploration
 
 Below is an example interactive widget that lets you explore a subset of
-our final dataset. In the full project, this will be replaced by a plot
-using the real `df_clean` DataFrame.
+our final dataset.
 
 ```{python}
-import plotly.express as px
 import pandas as pd
+import plotly.express as px
 
-demo = pd.DataFrame({
-    "country": ["A", "B", "C", "D"],
-    "gdp_per_capita_usd": [1000, 5000, 15000, 25000],
-    "cases_per_100k": [200, 800, 1200, 400]
-})
+# 1. Load enriched data
+df_enriched = pd.read_csv("data/df_enriched.csv")
 
+# 2. Create health_status if it doesn't already exist
+if "health_status" not in df_enriched.columns:
+    df_enriched["health_status"] = pd.cut(
+        df_enriched["life_expectancy"],
+        bins=[0, 65, 75, 80, 100],
+        labels=["Low (≤65)", "Medium (65–75)", "High (75–80)", "Very High (>80)"],
+    )
+
+# 3. Prepare a clean subset for plotting (no NaNs in key columns)
+plot_cols = [
+    "health_expenditure_usd",
+    "life_expectancy",
+    "infant_mortality_rate",
+    "location_key",
+    "health_status",
+]
+df_plot = df_enriched.dropna(subset=plot_cols).copy()
+
+# Ensure size column is non-negative and numeric
+df_plot = df_plot[df_plot["infant_mortality_rate"] >= 0]
+
+# 4. Build interactive Plotly scatter
 fig = px.scatter(
-    demo,
-    x="gdp_per_capita_usd",
-    y="cases_per_100k",
-    hover_name="country",
-    title="Demo: GDP per Capita vs Cases per 100k"
+    df_plot,
+    x="health_expenditure_usd",
+    y="life_expectancy",
+    hover_name="location_key",
+    color="health_status",
+    size="infant_mortality_rate",
+    size_max=30,
+    title="Health Expenditure vs Life Expectancy (bubble size = Infant Mortality)",
+    labels={
+        "health_expenditure_usd": "Health Expenditure (USD per capita)",
+        "life_expectancy": "Life Expectancy (years)",
+        "infant_mortality_rate": "Infant Mortality (per 1,000 births)",
+        "health_status": "Health Status Group",
+    },
+)
+
+# log scale on x-axis
+fig.update_xaxes(type="log")
+
+fig
+
+```
+
+```{python}
+import pandas as pd
+import plotly.express as px
+
+df_enriched = pd.read_csv("data/df_enriched.csv")
+
+corr_vars = [
+"life_expectancy", "health_expenditure_usd", "infant_mortality_rate",
+"physicians_per_1000", "smoking_prevalence", "diabetes_prevalence"
+]
+
+corr = df_enriched[corr_vars].corr().round(2)
+
+fig = px.imshow(
+corr,
+text_auto=True,
+color_continuous_scale="RdBu_r",
+zmin=-1, zmax=1,
+title="Interactive Correlation Matrix: Key Health Indicators"
 )
 fig
+
+```
+
+
+
+```{python}
+import pandas as pd
+from itables import init_notebook_mode, show
+
+init_notebook_mode(all_interactive=True)
+
+df_enriched = pd.read_csv("data/df_enriched.csv")
+
+cols = [
+"location_key",
+"life_expectancy",
+"health_expenditure_usd",
+"infant_mortality_rate"
+]
+
+show(
+df_enriched[cols].sort_values("life_expectancy", ascending=False),
+)
+
 ```
 
 ## 4. Key Visualizations
