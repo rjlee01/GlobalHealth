@@ -2,7 +2,7 @@
 title: "Global Health & Economic Vulnerability"
 format:
   html:
-    toc: false
+    toc: true
 ---
 
 # Global Health Analysis
