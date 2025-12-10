@@ -14,6 +14,8 @@ website:
         text: Cleaning & Enrichment
       - href: analysis.ipynb
         text: Analysis & Visuals
+      - href: regression.ipynb
+        text: Interactive Regression
   page-footer:
     left: "© 2025 Global Health Analysis — Minh & Rayner."
     right: "Built with Quarto & Python"
