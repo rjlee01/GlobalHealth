@@ -70,6 +70,13 @@ These are explored in more depth on the **Analysis & Visuals** page.
 Below is an example interactive widget that lets you explore a subset of
 our final dataset.
 
+### 3.1 Health Spending vs Life Expectancy
+
+This interactive scatterplot lets you explore how life expectancy changes 
+with health expenditure per capita, with bubble size capturing infant mortality 
+and color showing health status groups.
+
+
 ```{python}
 import pandas as pd
 import plotly.express as px
@@ -123,6 +130,11 @@ fig
 
 ```
 
+### 3.2 Correlation Matrix of Key Health Indicators
+
+This interactive heatmap shows pairwise correlations between selected health and spending variables, 
+helping you quickly see which indicators move together or in opposite directions.
+
 ```{python}
 import pandas as pd
 import plotly.express as px
@@ -147,7 +159,9 @@ fig
 
 ```
 
+### 3.3 Country-Level Interactive Table
 
+Use this interactive table to filter, sort, and search country-level statistics, making it easy to compare life expectancy, health spending, and infant mortality across countries.
 
 ```{python}
 import pandas as pd
@@ -198,21 +212,29 @@ show(
 Here are some of the main figures from our analysis.
 
 ### Model Performance
+This plot compares different modeling approaches for predicting life expectancy 
+and shows how closely their fitted values track the observed outcomes.
 
 ![](images/modelperformance.png){fig-alt="Model performance of life expectancy models" width="70%"}
 
 ### Global Distribution of Mortality
+This figure summarizes the spread of different mortality indicators across countries, 
+highlighting which types of mortality are most unevenly distributed.
 
 ![](images/globaldistribution_of_mortality.png){fig-alt="Global distribution of mortality rates" width="70%"}
 
 ### Distribution and Country Count
+These plots group countries into health-status buckets and show how many fall into each category, making the global life-expectancy gap easier to see at a glance.
 
 ![](images/distribution_and_countrycount.png){fig-alt="Distribution of life expectancy and country counts" width="70%"}
 
 ### Correlation Matrix of Indicators
+This correlation matrix visualizes how core health indicators and resource variables move together, 
+helping to spot potential drivers of life expectancy.
 
 ![](images/corrmatrix_indicators.png){fig-alt="Correlation matrix of health indicators" width="70%"}
 
 ### Health Spending vs Life Expectancy
+This chart shows how higher health expenditure is associated with longer life expectancy, while also revealing outliers that spend a lot but do not achieve proportionate health gains.
 
 ![](images/healthspending_on_lifeexpectancy.png){fig-alt="Health spending vs life expectancy plot" width="70%"}
