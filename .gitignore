@@ -1,2 +1,19 @@
-/.quarto/
-**/*.quarto_ipynb
+# Python cache / build
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Jupyter + Quarto artifacts
+.ipynb_checkpoints/
+.quarto/
+*.quarto_ipynb
+
+# OS files
+.DS_Store
+Thumbs.db
