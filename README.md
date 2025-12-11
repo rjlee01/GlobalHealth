@@ -51,6 +51,7 @@ GlobalHealth/
 ├─ enrichment.ipynb     # Cleaning, merging, feature engineering
 ├─ analysis.ipynb       # Statistical analysis + static plots
 ├─ regression.ipynb     # Interactive regression explorer
+├─ all.ipynb            # Jupyter notebook with all steps combined
 ├─ index.qmd            # Quarto homepage (interactive visuals)
 ├─ _quarto.yml          # Quarto website configuration
 ├─ requirements.txt
@@ -68,6 +69,7 @@ Regenerate enriched datasets
 Recreate analysis & visuals
     Open analysis.ipynb or view them on the Quarto site.
 Render the website locally (optional)
+
 ```bash
 quarto render
 ```

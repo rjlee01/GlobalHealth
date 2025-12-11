@@ -7,6 +7,8 @@ format:
 
 # Global Health Analysis
 
+![](images/global_health.jpeg){width="70%" fig-alt="Global Health Overview Image"}
+
 This website presents an exploratory data analysis of global health indicators
 and their relationship to economic conditions across countries.
 
